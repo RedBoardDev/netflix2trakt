@@ -38,7 +38,7 @@ cp env.example .env      # then add your key(s); .env is git-ignored
 ```
 
 ```ini
-TMDB_BEARER=eyJhbGciOi...   # v4 token (or TMDB_API_KEY for a v3 key)
+TMDB_BEARER=<your-v4-read-access-token>   # or use TMDB_API_KEY for a v3 key
 # MISTRAL_API_KEY=...       # only for --llm
 ```
 
