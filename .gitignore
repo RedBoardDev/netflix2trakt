@@ -1,0 +1,24 @@
+# Secrets and personal data — never commit these
+.env
+*.csv
+
+# On-disk API response caches
+tmdb_cache.json
+llm_cache.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+
+# Editors / OS / tooling
+.DS_Store
+.idea/
+.vscode/
+.claude/
