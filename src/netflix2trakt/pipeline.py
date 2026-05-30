@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from typing import Callable, Optional
+from typing import Callable
 
 from .matching import ACCEPT_SCORE, MatchRow, match_episode, order_infer, resolve_show
 from .mistral import MistralClient
@@ -73,7 +73,7 @@ class PipelineResult:
 def run(
     rows: list[HistoryRow],
     tmdb: TmdbClient,
-    mistral: Optional[MistralClient] = None,
+    mistral: MistralClient | None = None,
     *,
     use_llm: bool = False,
     log: Callable[[str], None] = lambda message: None,
@@ -95,12 +95,12 @@ def run(
         return False
 
     # Resolve each unique show once (disambiguating remakes).
-    show_rows: dict[Optional[str], list[HistoryRow]] = {}
+    show_rows: dict[str | None, list[HistoryRow]] = {}
     for row in rows:
         if row.parsed.kind in ("episode", "ambiguous"):
             show_rows.setdefault(row.parsed.show, []).append(row)
     log(f"Resolving {len(show_rows)} unique shows...")
-    show_to_tv: dict[Optional[str], Optional[dict]] = {}
+    show_to_tv: dict[str | None, dict | None] = {}
     for name, group in show_rows.items():
         if not name:
             show_to_tv[name] = None
@@ -134,9 +134,9 @@ def run(
             continue
 
         tv = show_to_tv.get(parsed.show)
-        episode: Optional[Episode] = None
+        episode: Episode | None = None
         score = 0.0
-        season_found: Optional[int] = None
+        season_found: int | None = None
         if tv:
             episode, score, season_found = match_episode(
                 tmdb, tv["id"], parsed.season, parsed.episode_title or ""
@@ -160,7 +160,7 @@ def run(
     tmdb.save()
 
     # Phase 2: per (show, season) -> emit confident anchors, then safe order-inference.
-    leftovers: list[tuple[MatchRow, int, str, Optional[int]]] = []
+    leftovers: list[tuple[MatchRow, int, str, int | None]] = []
     for (tv_id, season, tv_name), match_rows in groups.items():
         for match in match_rows:
             if match.is_confident:
@@ -223,7 +223,7 @@ def run(
                                                   "LLM: no reliable match", confidence))
         mistral.save()
     else:
-        for match, tv_id, tv_name, season in leftovers:
+        for match, _tv_id, tv_name, _season in leftovers:
             row = match.data
             result.review.append(ReviewEntry(row.raw_title, row.watched_at, row.parsed.kind, tv_name,
                                               "divergent title (unresolved)", ""))

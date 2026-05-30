@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import Optional
 
 # Netflix exports a date only; we stamp a fixed time so timezone conversions never
 # shift an entry to the previous/next day.
@@ -46,14 +45,14 @@ class ParsedTitle:
     """Structured view of a Netflix title string."""
 
     kind: str  # "movie" | "episode" | "ambiguous" | "blank"
-    title: Optional[str] = None  # movie title
-    show: Optional[str] = None  # series name
-    season: Optional[int] = None  # season number (None when unknown)
-    episode_title: Optional[str] = None  # episode label
-    full: Optional[str] = None  # original full string (kept for the ambiguous case)
+    title: str | None = None  # movie title
+    show: str | None = None  # series name
+    season: int | None = None  # season number (None when unknown)
+    episode_title: str | None = None  # episode label
+    full: str | None = None  # original full string (kept for the ambiguous case)
 
 
-def parse_watched_at(date: str) -> Optional[str]:
+def parse_watched_at(date: str) -> str | None:
     """Convert a Netflix ``M/D/YY`` date to an ISO-8601 UTC timestamp, or ``None``."""
     match = _DATE.match(date or "")
     if not match:
@@ -74,8 +73,8 @@ def parse_title(raw: str) -> ParsedTitle:
     if len(parts) == 1:
         return ParsedTitle(kind="movie", title=parts[0])
 
-    season_index: Optional[int] = None
-    season_number: Optional[int] = None
+    season_index: int | None = None
+    season_number: int | None = None
     for index in range(1, len(parts)):
         match = _SEASON.match(parts[index])
         if match:

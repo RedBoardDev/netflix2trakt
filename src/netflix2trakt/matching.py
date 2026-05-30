@@ -12,7 +12,6 @@ Three independent strategies, from most to least certain:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
 
 from .parsing import EPISODE_NUMBER
 from .text import title_score
@@ -27,7 +26,7 @@ class MatchRow:
     """A history row paired with its best episode match (used by Phase 2 reconciliation)."""
 
     index: int  # position in the original input, for watch-order inference
-    episode: Optional[Episode]
+    episode: Episode | None
     score: float
     data: object = None  # opaque payload owned by the caller
 
@@ -37,16 +36,16 @@ class MatchRow:
 
 
 def match_episode(
-    tmdb: TmdbClient, tv_id: int, season: Optional[int], episode_title: str
-) -> tuple[Optional[Episode], float, Optional[int]]:
+    tmdb: TmdbClient, tv_id: int, season: int | None, episode_title: str
+) -> tuple[Episode | None, float, int | None]:
     """Return ``(episode, score, season)`` for the best match, searching one or all seasons."""
     seasons = [season] if season is not None else tmdb.tv_seasons(tv_id)
     number_hint = EPISODE_NUMBER.match(episode_title or "")
     wanted_number = int(number_hint.group(1)) if number_hint else None
 
-    best: Optional[Episode] = None
+    best: Episode | None = None
     best_score = 0.0
-    best_season: Optional[int] = None
+    best_season: int | None = None
     for season_number in seasons:
         for episode in tmdb.season_episodes(tv_id, season_number):
             # A generic "Épisode N" label matches by number within a known season.
@@ -66,8 +65,8 @@ def match_episode(
 
 
 def resolve_show(
-    tmdb: TmdbClient, name: str, sample_episodes: list[tuple[Optional[int], Optional[str]]]
-) -> Optional[dict]:
+    tmdb: TmdbClient, name: str, sample_episodes: list[tuple[int | None, str | None]]
+) -> dict | None:
     """Pick the show for ``name``, disambiguating same-named remakes by their episodes."""
     candidates = [(show, score) for show, score in tmdb.search_tv_candidates(name) if score >= 0.55]
     if not candidates:
@@ -85,7 +84,7 @@ def resolve_show(
     if not samples:
         return candidates[0][0]
 
-    best: Optional[dict] = None
+    best: dict | None = None
     best_key = (-1.0, -1.0)
     for show, score in candidates[:3]:
         hits = total = 0
@@ -106,7 +105,7 @@ def resolve_show(
 
 
 def order_infer(
-    tmdb: TmdbClient, tv_id: int, season: Optional[int], rows: list[MatchRow]
+    tmdb: TmdbClient, tv_id: int, season: int | None, rows: list[MatchRow]
 ) -> list[tuple[MatchRow, Episode]]:
     """Fill the un-matched rows of a season by watch order, only when provably safe.
 

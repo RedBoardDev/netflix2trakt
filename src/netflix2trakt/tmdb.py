@@ -13,7 +13,6 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass, field
-from typing import Optional
 
 from .text import title_score
 
@@ -31,7 +30,7 @@ class Episode:
     season_number: int
     episode_number: int
     names: list[str] = field(default_factory=list)
-    air_date: Optional[str] = None
+    air_date: str | None = None
 
 
 class TmdbAuthError(RuntimeError):
@@ -41,7 +40,7 @@ class TmdbAuthError(RuntimeError):
 class TmdbClient:
     """Thin wrapper over the TMDB REST API with on-disk response caching."""
 
-    def __init__(self, cache_path: str, *, bearer: Optional[str] = None, api_key: Optional[str] = None):
+    def __init__(self, cache_path: str, *, bearer: str | None = None, api_key: str | None = None):
         self.cache_path = cache_path
         self.cache: dict[str, object] = {}
         if os.path.exists(cache_path):
@@ -66,7 +65,7 @@ class TmdbClient:
         with open(self.cache_path, "w", encoding="utf-8") as handle:
             json.dump(self.cache, handle)
 
-    def _get(self, path: str, **params: str) -> Optional[dict]:
+    def _get(self, path: str, **params: str) -> dict | None:
         if self.api_key:
             params["api_key"] = self.api_key
         url = f"{TMDB_API_ROOT}{path}?{urllib.parse.urlencode(params)}"
@@ -105,7 +104,7 @@ class TmdbClient:
         return None
 
     # -- typed helpers -----------------------------------------------------------
-    def search_movie(self, title: str) -> tuple[Optional[dict], float]:
+    def search_movie(self, title: str) -> tuple[dict | None, float]:
         """Return the best movie result for ``title`` and its title-similarity score."""
         data = self._get("/search/movie", query=title, language="fr-FR", include_adult="false") or {}
         best, best_score = None, 0.0

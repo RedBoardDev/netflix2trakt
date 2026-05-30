@@ -12,7 +12,6 @@ import os
 import time
 import urllib.error
 import urllib.request
-from typing import Optional
 
 from .tmdb import Episode
 
@@ -29,8 +28,8 @@ _SYSTEM_PROMPT = (
 class MistralClient:
     """Cached client over the Mistral chat-completions endpoint."""
 
-    def __init__(self, cache_path: str, *, api_key: Optional[str], model: Optional[str] = None,
-                 url: Optional[str] = None):
+    def __init__(self, cache_path: str, *, api_key: str | None, model: str | None = None,
+                 url: str | None = None):
         self.cache_path = cache_path
         self.cache: dict[str, dict] = {}
         if os.path.exists(cache_path):
@@ -54,7 +53,7 @@ class MistralClient:
         cache_key: str,
         show_name: str,
         netflix_title: str,
-        season_hint: Optional[int],
+        season_hint: int | None,
         candidates: list[Episode],
     ) -> dict:
         """Ask the model which candidate matches; return ``{season, episode, confidence}``."""

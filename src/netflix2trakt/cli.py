@@ -7,7 +7,6 @@ import csv
 import os
 import sys
 from collections import Counter
-from typing import Optional
 
 from . import __version__
 from .mistral import MistralClient
@@ -91,7 +90,7 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv: Optional[list[str]] = None) -> int:
+def main(argv: list[str | None] = None) -> int:
     args = build_parser().parse_args(argv)
     load_dotenv()
 
