@@ -26,7 +26,7 @@ Unresolved rows go to `needs_review.csv` instead of being mis-mapped. Multiple C
 ## Install
 
 ```bash
-git clone https://github.com/OWNER/netflix2trakt.git
+git clone https://github.com/RedBoardDev/netflix2trakt.git
 cd netflix2trakt
 pip install .
 ```
@@ -81,4 +81,4 @@ Modules under `src/netflix2trakt/`: `parsing`, `text`, `tmdb`, `mistral`, `match
 
 ## License
 
-[MIT](LICENSE) © Thomas Ott. Not affiliated with Netflix, Trakt or TMDB; uses the TMDB API but is not endorsed by TMDB.
+[MIT](LICENSE) Not affiliated with Netflix, Trakt or TMDB; uses the TMDB API but is not endorsed by TMDB.

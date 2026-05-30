@@ -27,9 +27,9 @@ dependencies = []
 dev = ["pytest>=7", "ruff>=0.4"]
 
 [project.urls]
-Homepage = "https://github.com/OWNER/netflix2trakt"
-Repository = "https://github.com/OWNER/netflix2trakt"
-Issues = "https://github.com/OWNER/netflix2trakt/issues"
+Homepage = "https://github.com/RedBoardDev/netflix2trakt"
+Repository = "https://github.com/RedBoardDev/netflix2trakt"
+Issues = "https://github.com/RedBoardDev/netflix2trakt/issues"
 
 [project.scripts]
 netflix2trakt = "netflix2trakt.cli:main"
